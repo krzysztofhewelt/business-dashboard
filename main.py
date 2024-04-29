@@ -7,7 +7,7 @@ import pandas as pd
 
 app = Dash(__name__)
 
-df = pd.read_csv('stock.csv')
+df = pd.read_csv('stock/stock.csv')
 stock_symbols = df['symbol'].unique()
 
 app.layout = html.Div([
@@ -40,7 +40,7 @@ app.layout = html.Div([
     Input("stock-market-date-range", "end_date"),
 )
 def update_bar_chart(dims, start_date, end_date):
-    df = pd.read_csv('stock.csv')
+    df = pd.read_csv('stock/stock.csv')
 
     df_filtered = df[df['symbol'].isin(dims) == True].sort_values(by=['date'], ascending=True)
 
