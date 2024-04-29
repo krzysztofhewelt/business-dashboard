@@ -1,8 +1,6 @@
 from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 from datetime import date
-from pmdarima.arima import auto_arima
-from statsmodels.tsa.seasonal import seasonal_decompose
 import pandas as pd
 
 app = Dash(__name__)
@@ -10,56 +8,133 @@ app = Dash(__name__)
 df = pd.read_csv('stock/stock.csv')
 stock_symbols = df['symbol'].unique()
 
+df_crypto = pd.read_csv('stock/crypto.csv')
+crypto_symbol = df_crypto['symbol'].unique()
+
 app.layout = html.Div([
     html.H1('Stock Investor Portfolio'),
-    html.Label('Select stock symbol(s):', style={'font-weight': 'bold'}),
+    html.Div([
+        html.Div([
+            html.Label('Select stock symbol(s):'),
+            dcc.Dropdown(
+                id="stock-symbols-dropdown",
+                options=stock_symbols,
+                value=[],
+                multi=True
+            )
+        ], style={'width': '50%'}),
+        html.Div([
+            html.Label('Select date range:'),
+            dcc.DatePickerRange(
+                id='stock-market-date-range',
+                min_date_allowed=date(2021, 9, 8),
+                max_date_allowed=date(2024, 4, 25),
+                initial_visible_month=date(2024, 4, 25),
+                start_date=date(2023, 4, 25),
+                end_date=date(2024, 4, 25)
+            ),
+            html.Div(id='output-container-start-date-picker-single'),
+        ])
+    ], style={'display': 'flex', 'gap': '40px', 'width': '100%'}),
+
+    html.Div([
+        html.Div([
+            html.Label('Select type of data:'),
+            dcc.Dropdown(
+                id="stock-data-dropdown",
+                options=['open', 'high', 'low', 'close', 'volume'],
+                value='open',
+                multi=False,
+                clearable=False
+            ),
+        ]),
+
+        html.Div([
+            html.Label('Select currency:', htmlFor='stock-currency-dropdown'),
+            dcc.Dropdown(
+                id="stock-currency-dropdown",
+                options=['PLN', 'EUR', 'USD', 'GBP', 'SEK', 'NOK', 'CHF', 'JPY'],
+                value='USD',
+                multi=False,
+                clearable=False
+            )
+        ])
+
+    ], style={'display': 'flex', 'gap': '40px', 'width': '100%'}),
+
+    html.Div([
+        dcc.Graph(id="stock-graph", style={'width': '80%', 'height': '100%'}),
+        html.Div([
+            'Symulacja zysków lub ',
+            'procenty zysków/strat z 7/15/... dni'
+        ], style={'height': '100%'})
+    ], style={'display': 'flex'}),
+
+
+
+    html.H1('Currencies'),
+    dcc.Graph(id="currency-graph", style={'width': '80%', 'height': '100%'}),
+
+
+
+    html.H1('Cryptocurrencies'),
     dcc.Dropdown(
-        id="stock-symbols-dropdown",
-        options=stock_symbols,
+        id="crypto-currency-dropdown",
+        options=crypto_symbol,
         value=[],
         multi=True
     ),
-    html.Label('Select date range:', style={'font-weight': 'bold'}),
-    dcc.DatePickerRange(
-        id='stock-market-date-range',
-        min_date_allowed=date(2021, 9, 8),
-        max_date_allowed=date(2024, 4, 25),
-        initial_visible_month=date(2024, 4, 25),
-        start_date=date(2023, 4, 25),
-        end_date=date(2024, 4, 25)
-    ),
-    html.Div(id='output-container-start-date-picker-single'),
-    dcc.Graph(id="plotly-express-x-graph"),
-])
+    dcc.Graph(id="crypto-graph")
+
+], style={'padding': '20px 30px'})
 
 
 @app.callback(
-    Output("plotly-express-x-graph", "figure"),
+    Output("stock-graph", "figure"),
     Input("stock-symbols-dropdown", "value"),
     Input("stock-market-date-range", "start_date"),
     Input("stock-market-date-range", "end_date"),
+    Input("stock-data-dropdown", "value"),
+    Input("stock-currency-dropdown", "value"),
 )
-def update_bar_chart(dims, start_date, end_date):
+def update_stock_data(symbols, start_date, end_date, typeOfData, currency):
     df = pd.read_csv('stock/stock.csv')
 
-    df_filtered = df[df['symbol'].isin(dims) == True].sort_values(by=['date'], ascending=True)
+    df_filtered = df[df['symbol'].isin(symbols) == True].sort_values(by=['date'], ascending=True)
+    df_filtered = df_filtered[(df_filtered['date'] >= start_date) & (df_filtered['date'] <= end_date)]
 
-    # train/test data splitting
-    # train = df_filtered[(df_filtered['date'] >= "2021-09-08") & (df_filtered['date'] < "2023-12-30")]
-    # test = df_filtered[(df_filtered['date'] > "2024-01-01")]
-
-    # using arima model to predict data (średnia ruchoma)
-    model = auto_arima(df_filtered['open'], seasonal=True, m=4)
-    future_steps = 12  # np. prognoza na 12 miesięcy
-    forecast, conf_int = model.predict(n_periods=future_steps, return_conf_int=True)
-
-    print(forecast)
-
-    fig = px.line(x=pd.date_range(start=df_filtered['date'], periods=future_steps, freq='M'), y=forecast)
-    fig.show()
+    fig = px.line(df_filtered, x='date', y=typeOfData, color='symbol')
+    fig.update_xaxes(rangeslider_visible=True)
 
     return fig
 
+
+@app.callback(
+    Output("currency-graph", "figure"),
+    Input("stock-currency-dropdown", 'value')
+)
+def update_currency_data(currency):
+    df = pd.read_csv('exchange/currencies.csv')
+
+    if currency:
+        df_filtered = df[['date', currency]]
+        fig = px.line(df_filtered, x='date', y=currency)
+        return fig
+
+    return None
+
+
+@app.callback(
+    Output("crypto-graph", "figure"),
+    Input("crypto-currency-dropdown", 'value')
+)
+def update_crypto_data(symbols):
+    df = pd.read_csv('stock/crypto.csv')
+
+    df_filtered = df[df['symbol'].isin(symbols) == True].sort_values(by=['date'], ascending=True)
+    fig = px.line(df_filtered, x='date', y='open', color='symbol')
+
+    return fig
 
 if __name__ == "__main__":
     app.run_server(debug=True)
