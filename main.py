@@ -91,6 +91,7 @@ def update_currency_data(currency, start_date, end_date):
         df_prepared = get_data_in_time_range(df_prepared, start_date, end_date)
 
         fig = px.line(df_prepared, x="date", y=currency, template='simple_white')
+        fig.update_yaxes(showgrid=True)
         fig.update_xaxes(rangeslider_visible=True)
         return fig
 
@@ -110,6 +111,7 @@ def update_crypto_data(symbols, start_date, end_date, type_of_data):
     df_prepared = get_data_in_time_range(df_prepared, start_date, end_date)
 
     fig = px.line(df_prepared, x="date", y=type_of_data, color="symbol", template='simple_white')
+    fig.update_yaxes(showgrid=True)
     fig.update_xaxes(rangeslider_visible=True)
 
     return fig
