@@ -2,11 +2,12 @@ from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 from datetime import date
 import pandas as pd
+from utils import get_gauge, get_values
 
 app = Dash(__name__)
 
-df = pd.read_csv("stock/stock.csv")
-stock_symbols = df["symbol"].unique()
+df_stock = pd.read_csv("stock/stock.csv")
+stock_symbols = df_stock["symbol"].unique()
 
 df_crypto = pd.read_csv("stock/crypto.csv")
 crypto_symbol = df_crypto["symbol"].unique()
@@ -87,10 +88,18 @@ app.layout = html.Div(
         ),
         html.Div(
             [
-                dcc.Graph(id="stock-graph", style={"width": "80%", "height": "100%"}),
-                html.Div(
-                    ["Symulacja zysków lub ", "procenty zysków/strat z 7/15/... dni"],
-                    style={"height": "100%"},
+                dcc.Graph(id="stock-graph", style={"width": "100%", "height": "100%"}),
+            ],
+            style={"display": "flex"},
+        ),
+        html.Div(
+            [
+                dcc.Graph(id="stock-gauge-7", style={"width": "33%", "height": "100%"}),
+                dcc.Graph(
+                    id="stock-gauge-15", style={"width": "33%", "height": "100%"}
+                ),
+                dcc.Graph(
+                    id="stock-gauge-30", style={"width": "33%", "height": "100%"}
                 ),
             ],
             style={"display": "flex"},
@@ -138,6 +147,67 @@ def update_stock_data(symbols, start_date, end_date, type_of_data, currency):
     fig.update_xaxes(rangeslider_visible=True)
 
     return fig
+
+
+@app.callback(
+    Output("stock-gauge-15", "figure"),
+    Input("stock-symbols-dropdown", "value"),
+    Input("stock-market-date-range", "start_date"),
+    Input("stock-data-dropdown", "value"),
+    Input("stock-currency-dropdown", "value"),
+)
+def update_stock_gauge_15(symbols, start_date, type_of_data, currency):
+    df_filtered = df_stock[df_stock["symbol"] == symbols[0]]
+    days_back = 15
+
+    value, past_value, max_value, min_value = get_values(
+        data=df_filtered,
+        target_date=start_date,
+        days_back=days_back,
+        type_of_data=type_of_data,
+    )
+
+    return get_gauge(value, past_value, min_value, max_value, days_back)
+
+@app.callback(
+    Output("stock-gauge-7", "figure"),
+    Input("stock-symbols-dropdown", "value"),
+    Input("stock-market-date-range", "start_date"),
+    Input("stock-data-dropdown", "value"),
+    Input("stock-currency-dropdown", "value"),
+)
+def update_stock_gauge_7(symbols, start_date, type_of_data, currency):
+    df_filtered = df_stock[df_stock["symbol"] == symbols[0]]
+    days_back = 7
+
+    value, past_value, max_value, min_value = get_values(
+        data=df_filtered,
+        target_date=start_date,
+        days_back=days_back,
+        type_of_data=type_of_data,
+    )
+
+    return get_gauge(value, past_value, min_value, max_value, days_back)
+
+@app.callback(
+    Output("stock-gauge-30", "figure"),
+    Input("stock-symbols-dropdown", "value"),
+    Input("stock-market-date-range", "start_date"),
+    Input("stock-data-dropdown", "value"),
+    Input("stock-currency-dropdown", "value"),
+)
+def update_stock_gauge_30(symbols, start_date, type_of_data, currency):
+    df_filtered = df_stock[df_stock["symbol"] == symbols[0]]
+    days_back = 30
+
+    value, past_value, max_value, min_value = get_values(
+        data=df_filtered,
+        target_date=start_date,
+        days_back=days_back,
+        type_of_data=type_of_data,
+    )
+
+    return get_gauge(value, past_value, min_value, max_value, days_back)
 
 
 @app.callback(
