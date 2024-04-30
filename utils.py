@@ -19,6 +19,7 @@ def get_values(data, target_date, days_back, type_of_data):
             - Minimum value between given and past date
     """
     # Convert date column to datetime type
+
     data["date"] = pd.to_datetime(data["date"])
 
     # Convert target_date to datetime
@@ -50,13 +51,29 @@ def get_values(data, target_date, days_back, type_of_data):
     return target_value, past_value, max_value, min_value
 
 
+def generate_proper_gauge(data, symbols, end_date, type_of_data, days_back, currency):
+    if not symbols:
+        return get_gauge(0, 0, 0, 0, days_back)
+
+    df_filtered = data[data["symbol"] == symbols[0]]
+
+    value, past_value, max_value, min_value = get_values(
+        data=df_filtered.copy(),
+        target_date=end_date,
+        days_back=days_back,
+        type_of_data=type_of_data,
+    )
+
+    return get_gauge(value, past_value, min_value, max_value, days_back)
+
+
 def get_gauge(value, past_value, min_value, max_value, days):
     return go.Figure(
         go.Indicator(
             domain={"x": [0, 1], "y": [0, 1]},
             value=value,
-            mode="gauge+number+delta",
-            title={"text": f"Stock price {days} days"},
+            mode="delta",
+            title={"text": f"Last {days} days"},
             delta={"reference": past_value},
             gauge={
                 "axis": {"range": [min_value, max_value]},

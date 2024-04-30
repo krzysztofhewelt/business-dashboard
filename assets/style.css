@@ -1,5 +1,62 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
 label {
     display: block;
     font-weight: bold;
     font-size: 1.1rem;
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.header {
+    border-radius: 30px;
+    background-color: #ffffb5;
+    background-image: linear-gradient(315deg, #ffffb5 0%, #247ba0 74%);
+    display: flex;
+    color: white;
+    font-size: 28px;
+    padding: 20px 30px;
+    justify-content: space-between;
+}
+
+.header__section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.container {
+    border: 1px solid limegreen;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.container__title {
+    width: 100%;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: limegreen;
+    color: white;
+    padding: 10px 20px;
+}
+
+.container__content {
+    padding: 20px;
+}
+
+.container__filters {
+    display: flex;
+    gap: 20px;
+    width: 70%;
+}
+
+.Select-placeholder {
+    color: black !important;
 }
