@@ -4,6 +4,7 @@ from utils import generate_proper_gauge
 from layout import header, stock_layout, currencies_layout, cryptocurrencies_layout
 from data_utils import load_stock_data, load_currencies_data, load_crypto_data, get_data_in_time_range, \
     get_data_by_symbols, get_data_by_currencies
+from currencies import transform_price
 
 app = Dash(__name__)
 
@@ -31,7 +32,17 @@ def update_stock_data(symbols, start_date, end_date, type_of_data, currency):
     df_prepared = get_data_by_symbols(df, symbols)
     df_prepared = get_data_in_time_range(df_prepared, start_date, end_date)
 
-    fig = px.line(df_prepared, x="date", y=type_of_data, color="symbol", template="simple_white")
+    if currency != "USD":
+        df_prepared = transform_price(df_prepared, type_of_data, currency)
+
+    fig = px.line(
+        df_prepared,
+        x="date",
+        y=type_of_data,
+        labels={type_of_data: type_of_data + f"[{currency}]"},
+        color="symbol",
+        template="simple_white",
+    )
     fig.update_yaxes(showgrid=True)
     fig.update_xaxes(rangeslider_visible=True)
 
@@ -104,13 +115,24 @@ def update_currency_data(currency, start_date, end_date):
     Input("stock-market-date-range", "start_date"),
     Input("stock-market-date-range", "end_date"),
     Input("crypto-data-dropdown", "value"),
+    Input("stock-currency-dropdown", "value"),
 )
-def update_crypto_data(symbols, start_date, end_date, type_of_data):
+def update_crypto_data(symbols, start_date, end_date, type_of_data, currency):
     df = load_crypto_data()
     df_prepared = get_data_by_symbols(df, symbols)
     df_prepared = get_data_in_time_range(df_prepared, start_date, end_date)
 
-    fig = px.line(df_prepared, x="date", y=type_of_data, color="symbol", template='simple_white')
+    if currency != "USD":
+        df_prepared = transform_price(df_prepared, type_of_data, currency)
+
+    fig = px.line(
+        df_prepared,
+        x="date",
+        y=type_of_data,
+        labels={type_of_data: type_of_data + f"[{currency}]"},
+        color="symbol",
+        template="simple_white",
+    )
     fig.update_yaxes(showgrid=True)
     fig.update_xaxes(rangeslider_visible=True)
 

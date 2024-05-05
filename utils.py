@@ -1,5 +1,6 @@
 import plotly.graph_objects as go
 import pandas as pd
+from currencies import transform_price
 
 
 def get_values(data, target_date, days_back, type_of_data):
@@ -56,6 +57,9 @@ def generate_proper_gauge(data, symbols, end_date, type_of_data, days_back, curr
         return get_gauge(0, 0, 0, 0, days_back)
 
     df_filtered = data[data["symbol"] == symbols[0]]
+
+    if currency != "USD":
+        df_filtered = transform_price(df_filtered, type_of_data, currency)
 
     value, past_value, max_value, min_value = get_values(
         data=df_filtered.copy(),
