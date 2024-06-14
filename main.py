@@ -21,6 +21,7 @@ app.layout = html.Div(
 
 @app.callback(
     Output("stock-graph", "figure"),
+    Output("first-stock", "children"),
     Input("stock-symbols-dropdown", "value"),
     Input("stock-market-date-range", "start_date"),
     Input("stock-market-date-range", "end_date"),
@@ -46,7 +47,11 @@ def update_stock_data(symbols, start_date, end_date, type_of_data, currency):
     fig.update_yaxes(showgrid=True)
     fig.update_xaxes(rangeslider_visible=True)
 
-    return fig
+    first_symbol = 'None'
+    if len(symbols) > 0:
+        first_symbol = symbols[0]
+
+    return fig, first_symbol
 
 
 @app.callback(

@@ -88,14 +88,15 @@ stock_layout = [
         ], className='container', style={'width': '70%'}),
 
         html.Div([
-            dcc.Graph(id="stock-gauge-7", style={"width": "100%", 'height': '300px', 'margin-top': '-50px'},
+            html.Div(id="first-stock", children=['None'], className='container__title'),
+            dcc.Graph(id="stock-gauge-7", style={"width": "100%", 'height': '300px'},
                       config={'displayModeBar': False}),
             dcc.Graph(
-                id="stock-gauge-15", style={"width": "100%", 'height': '300px', 'margin-top': '-80px'},
+                id="stock-gauge-15", style={"width": "100%", 'height': '300px', 'marginTop': '-80px'},
                 config={'displayModeBar': False}
             ),
             dcc.Graph(
-                id="stock-gauge-30", style={"width": "100%", 'height': '300px', 'margin-top': '-80px'},
+                id="stock-gauge-30", style={"width": "100%", 'height': '300px', 'marginTop': '-80px'},
                 config={'displayModeBar': False}
             ),
         ], className='container', style={'width': '30%'}),

@@ -21,4 +21,5 @@ def apply_prices(row, column, currency):
 
 
 def transform_price(df, column, currency):
-    return df.apply(lambda row: apply_prices(row, column, currency), axis=1)
+    df_copy = df.copy()
+    return df_copy.apply(lambda row: apply_prices(row, column, currency), axis=1)
