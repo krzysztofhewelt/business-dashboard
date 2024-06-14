@@ -31,3 +31,29 @@ Cryptocurrencies is within date 2022-02-07 and 2024-04-25.
 * Dash
 * Pandas
 * requests
+
+# Contributors
+<table>
+<tbody>
+<tr>
+<td align="center">
+<a href="https://github.com/krzysztofhewelt">
+<img width="64" height="64" src="https://avatars.githubusercontent.com/u/24493324?v=4" alt="krzysztofhewelt"><br>
+krzysztofhewelt
+</a>
+</td>
+<td align="center">
+<a href="https://github.com/amelcer">
+<img width="64" height="64" src="https://avatars.githubusercontent.com/u/60044260?s=64&v=4" alt="Andrzej Melcer"><br>
+Andrzej Melcer
+</a>
+</td>
+<td align="center">
+<a href="https://github.com/PanKrystian">
+<img width="64" height="64" src="https://avatars.githubusercontent.com/u/168426718?v=4" alt="PanKrystian"><br>
+PanKrystian
+</a>
+</td>
+</tr>
+</tbody>
+</table>
